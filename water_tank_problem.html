@@ -1,0 +1,130 @@
+<html>
+
+<head>
+	<title>Water tank problem</title>
+	<script>
+		// arr = [0,4,0,0,0,6,0,6,4,0]
+		function generateTable(no_of_column, no_of_rows, waterTankId) {
+			waterTankTable = document.getElementById(waterTankId);
+			waterTankTable.innerHTML = "";
+			waterTankTable.style.borderCollapse = "collapse";
+			for (let i = 0; i < no_of_rows; i++) {
+				const row = document.createElement("tr");
+				for (let j = 0; j < no_of_column; j++) {
+					cell = document.createElement("td");
+					cell.id = `${waterTankId}_cell_${i}_${j}`;
+					cell.style.height = "25px";
+					cell.style.width = "45px";
+					cell.style.border = "1px solid black";
+					row.appendChild(cell);
+				}
+				waterTankTable.appendChild(row);
+			}
+		}
+
+		function fillWater(arr, no_of_rows, waterTankId, fillWaterOnly) {
+			const arr_length = arr.length;
+			let no_of_cell_water_filled = 0;
+			const left_pointer = Array(arr_length);
+			left_pointer[0] = arr[0];
+			for (let i = 1; i < arr_length; i++) {
+				left_pointer[i] = Math.max(left_pointer[i - 1], arr[i]);
+			}
+			left_pointer[arr_length - 1] = arr[arr_length - 1];
+			const right_pointer = Array(arr_length);
+			right_pointer[arr_length - 1] = arr[arr_length - 1];
+			for (let i = arr_length - 2; i >= 0; i--) {
+				right_pointer[i] = Math.max(right_pointer[i + 1], arr[i]);
+			}
+			for (let i = 0; i < arr_length; i++) {
+				let minVal = Math.min(left_pointer[i], right_pointer[i]);
+				no_of_cell_water_filled += minVal - arr[i];
+				let incrementVal = 1;
+				for (let j = no_of_rows - 1; j >= no_of_rows - minVal; j--) {
+					if ((minVal - arr[i] === 0 || incrementVal <= arr[i])) {
+						incrementVal++;
+						if (!fillWaterOnly) {
+							document.getElementById(`${waterTankId}_cell_${j}_${i}`).style.backgroundColor =
+								"yellow";
+							if (j !== no_of_rows - 1) {
+								document.getElementById(`${waterTankId}_cell_${j}_${i}`).style.borderBottom =
+									"none";
+							}
+						}
+					} else {
+						document.getElementById(`${waterTankId}_cell_${j}_${i}`).style.backgroundColor =
+							"#44b2ea";
+						if (j !== no_of_rows - 1) {
+							document.getElementById(`${waterTankId}_cell_${j}_${i}`).style.borderBottom =
+								"none";
+						}
+					}
+
+					document.getElementById(`${waterTankId}_cell_${j}_${i}`).style.borderTop = "none";
+				}
+			}
+			document.getElementById(
+				"waterFillCount"
+			).innerHTML = `${no_of_cell_water_filled} Units`;
+			document.getElementById("input").style.display = "block"
+			document.getElementById("output").style.display = "block"
+		}
+		function generateWaterTankTable() {
+			arr = document
+				.getElementById("unitOfWater")
+				.value.split(",").map(Number);
+			console.log("arr", arr)
+			const isAllNumber = arr.every((ele) => !isNaN(ele))
+			if (!isAllNumber) {
+				document.getElementById("error").style.display = "block"
+				document.getElementById("input").style.display = "none"
+				document.getElementById("output").style.display = "none"
+				document.getElementById("waterTank").innerHTML = ""
+				document.getElementById("waterTankOutput").innerHTML = ""
+				document.getElementById("waterFillCount").innerHTML = ""
+				document.getElementById("error").innerHTML = "Invalid input. Input should contain only numbers separated by comma"
+				return
+			}
+			document.getElementById("error").style.display = "none"
+			document.getElementById("error").innerHTML = ""
+			arr_length = arr.length;
+			max_val = Math.max(...arr);
+			generateTable(arr_length, max_val + 1, "waterTank");
+			fillWater(arr, max_val + 1, "waterTank", false);
+			generateTable(arr_length, max_val + 1, "waterTankOutput");
+			fillWater(arr, max_val + 1, "waterTankOutput", true);
+		}
+	</script>
+	<style>
+		#input,
+		#output {
+			display: none;
+		}
+
+		#error {
+			color: red;
+			font-size: 14px;
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+	<input id="unitOfWater" placeholder="Enter comma separated values" style="width: 300px" />
+	<button onclick="generateWaterTankTable()">Calculate</button>
+	<br />
+	<br />
+	<div id="error"></div>
+	<h3 id="input">Input</h3>
+	<table id="waterTank"></table>
+	<h3 id="output">Output</h3>
+	<div id="waterFillCount"></div>
+	<br />
+	<table id="waterTankOutput"></table>
+	<br />
+	<br />
+	<br />
+	<br />
+</body>
+
+</html>
