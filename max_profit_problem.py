@@ -17,7 +17,7 @@ def get_max_earnings_and_sequence(unit_time):
         sequence, earnings = result[time]
         for land_type, time_needed, earning_per_unit in land_covers:
             next_time = time + time_needed
-            if next_time <= unit_time:
+            if next_time < unit_time:
                 new_earnings = earnings + (unit_time - next_time) * earning_per_unit 
                 existing_seqs, existing_earning = result[next_time]
                 if new_earnings > existing_earning:
